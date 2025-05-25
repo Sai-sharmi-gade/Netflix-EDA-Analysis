@@ -532,3 +532,4 @@ st.markdown("""
         <p style="color: #888; margin: 0.5rem 0 0 0;">Powered by Streamlit & Plotly</p>
     </div>
     """, unsafe_allow_html=True)
+
