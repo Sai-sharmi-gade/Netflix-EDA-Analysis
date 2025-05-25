@@ -528,7 +528,7 @@ st.markdown(
     """
     <div style='background-color:#1f1f1f; padding:20px; border-radius:10px; text-align:center; margin-bottom: 2rem;'>
         <h3 style='color:#E50914;'>💬 Loved the Dashboard?</h3>
-        <p style='color:#cccccc;'>I'd be thrilled to hear what you think! Connect with me on <a href='https://www.linkedin.com/in/sai-sharmi-gade/' target='_blank' style='color:#E50914; text-decoration: none;'>LinkedIn</a> and share your feedback!</p>
+        <p style='color:#cccccc;'>I'd be thrilled to hear what you think! Connect with me on <a href='www.linkedin.com/in/sai-sharmi-gade-55710828b' target='_blank' style='color:#E50914; text-decoration: none;'>LinkedIn</a> and share your feedback!</p>
     </div>
     """,
     unsafe_allow_html=True
