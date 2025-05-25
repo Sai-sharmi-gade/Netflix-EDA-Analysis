@@ -2,6 +2,9 @@
 
 Welcome to my data playground! In this project, I explored the Netflix dataset through visual storytelling and built a machine learning model to predict whether a title is a **Movie** or **TV Show** based on its features.
 
+
+UPDATE: 🎬 Check out the interactive Streamlit dashboard here: [Netflix Analytics Dashboard 🔗](https://netflix-analytics-dashboard.streamlit.app/)
+
 ---
 
 ## 🔍 Project Overview
