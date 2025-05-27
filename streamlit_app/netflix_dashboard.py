@@ -4,10 +4,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+import joblib # To save/load models and encoders
 
 # Set page config with Netflix theme
 st.set_page_config(
-    page_title="Netflix Analytics Dashboard", 
+    page_title="Netflix Analytics Dashboard",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -18,14 +22,14 @@ st.markdown("""
     <style>
     /* Import Netflix font */
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&family=Roboto:wght@300;400;500;700&display=swap');
-    
+
     /* Main background */
     .main {
         background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
         color: #ffffff;
         font-family: 'Roboto', sans-serif;
     }
-    
+
     /* Header styling */
     .main-header {
         background: linear-gradient(90deg, #E50914 0%, #B20710 100%);
@@ -34,7 +38,7 @@ st.markdown("""
         margin-bottom: 2rem;
         box-shadow: 0 8px 32px rgba(229, 9, 20, 0.3);
     }
-    
+
     .main-title {
         font-family: 'Bebas Neue', cursive;
         font-size: 3.5rem;
@@ -43,19 +47,19 @@ st.markdown("""
         margin: 0;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
-    
+
     .main-subtitle {
         text-align: center;
         font-size: 1.2rem;
         color: #f0f0f0;
         margin-top: 0.5rem;
     }
-    
+
     /* Sidebar styling */
     .css-1d391kg {
         background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
     }
-    
+
     /* Metric cards */
     .metric-container {
         background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
@@ -66,31 +70,31 @@ st.markdown("""
         margin: 0.5rem 0;
         transition: transform 0.3s ease;
     }
-    
+
     .metric-container:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(229, 9, 20, 0.2);
     }
-    
+
     .metric-value {
         font-size: 2.5rem;
         font-weight: bold;
         color: #E50914;
         margin: 0;
     }
-    
+
     .metric-label {
         font-size: 1rem;
         color: #cccccc;
         margin: 0;
     }
-    
+
     /* Custom styling for various elements */
     h1, h2, h3 {
         color: #E50914;
         font-family: 'Bebas Neue', cursive;
     }
-    
+
     /* Filter section */
     .filter-header {
         background: linear-gradient(90deg, #E50914 0%, #B20710 100%);
@@ -98,7 +102,7 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 1rem;
     }
-    
+
     /* Section headers */
     .section-header {
         background: linear-gradient(90deg, #333333 0%, #444444 100%);
@@ -107,17 +111,17 @@ st.markdown("""
         border-left: 4px solid #E50914;
         margin: 1rem 0;
     }
-    
+
     .stSelectbox > div > div {
         background-color: #2a2a2a;
         color: white;
     }
-    
+
     .stMultiSelect > div > div {
         background-color: #2a2a2a;
         color: white;
     }
-    
+
     /* Hide streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -143,14 +147,17 @@ def load_data():
         df['release_year'] = pd.to_numeric(df['release_year'], errors='coerce')
         df = df.dropna(subset=['release_year'])
         df['release_year'] = df['release_year'].astype(int)
-        
+
         # Clean country data
         df['country'] = df['country'].fillna('Unknown')
         df['first_country'] = df['country'].str.split(',').str[0].str.strip()
-        
+
         # Process genres
         df['listed_in'] = df['listed_in'].fillna('Unknown')
-        
+
+        # Drop rows with missing 'rating' for prediction model
+        df = df.dropna(subset=['rating'])
+
         return df
     except FileNotFoundError:
         st.error("Netflix dataset not found. Please ensure 'netflix_titles.csv' is in the same directory.")
@@ -161,6 +168,60 @@ df = load_data()
 
 if df.empty:
     st.stop()
+
+# --- Machine Learning Model Training/Loading ---
+# This section should ideally be run once to train and save the model/encoders.
+# For a deployed app, you'd load pre-trained assets.
+
+@st.cache_resource # Use st.cache_resource for models/heavy objects
+def train_and_load_model(dataframe):
+    # Prepare data for the model
+    model_df = dataframe.copy()
+    model_df = model_df.dropna(subset=['country', 'release_year', 'rating', 'listed_in', 'type'])
+
+    # Initialize LabelEncoders
+    le_country = LabelEncoder()
+    le_rating = LabelEncoder()
+    le_genre = LabelEncoder()
+    le_type = LabelEncoder()
+
+    # Fit and transform categorical features
+    model_df['country_encoded'] = le_country.fit_transform(model_df['country'])
+    model_df['rating_encoded'] = le_rating.fit_transform(model_df['rating'])
+    model_df['genre_encoded'] = le_genre.fit_transform(model_df['listed_in'])
+    model_df['type_encoded'] = le_type.fit_transform(model_df['type'])
+
+    # Define features (X) and target (y)
+    X = model_df[['country_encoded', 'release_year', 'rating_encoded', 'genre_encoded']]
+    y = model_df['type_encoded']
+
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train a simple classifier (e.g., Decision Tree)
+    model = DecisionTreeClassifier(random_state=42)
+    model.fit(X_train, y_train)
+
+    return model, le_country, le_rating, le_genre, le_type
+
+# Load or train the model and encoders
+try:
+    # Attempt to load pre-trained model and encoders
+    model = joblib.load('netflix_type_predictor_model.joblib')
+    le_country = joblib.load('le_country.joblib')
+    le_rating = joblib.load('le_rating.joblib')
+    le_genre = joblib.load('le_genre.joblib')
+    le_type = joblib.load('le_type.joblib')
+except FileNotFoundError:
+    st.info("Training a new prediction model. This might take a moment...")
+    model, le_country, le_rating, le_genre, le_type = train_and_load_model(df)
+    # Save the trained model and encoders for future use
+    joblib.dump(model, 'netflix_type_predictor_model.joblib')
+    joblib.dump(le_country, 'le_country.joblib')
+    joblib.dump(le_rating, 'le_rating.joblib')
+    joblib.dump(le_genre, 'le_genre.joblib')
+    joblib.dump(le_type, 'le_type.joblib')
+
 
 # Enhanced Sidebar with Netflix styling
 st.sidebar.markdown("""
@@ -263,11 +324,17 @@ if filtered_df.empty:
 st.markdown("## 📈 Interactive Analytics")
 
 # Create tabs for different chart categories
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Overview", "🌍 Geographic", "📅 Temporal", "🎭 Content Analysis"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📊 Overview",
+    "🌍 Geographic",
+    "📅 Temporal",
+    "🎭 Content Analysis",
+    "🧠 Type Predictor"
+])
 
 with tab1:
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Content Type Distribution - Donut Chart
         type_counts = filtered_df['type'].value_counts()
@@ -285,7 +352,7 @@ with tab1:
             title_font_size=20
         )
         st.plotly_chart(fig_donut, use_container_width=True)
-    
+
     with col2:
         # Top Ratings Distribution
         rating_counts = filtered_df['rating'].value_counts().head(8)
@@ -308,7 +375,7 @@ with tab1:
 
 with tab2:
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Top Countries
         country_counts = filtered_df['first_country'].value_counts().head(15)
@@ -328,12 +395,12 @@ with tab2:
             height=500
         )
         st.plotly_chart(fig_countries, use_container_width=True)
-    
+
     with col2:
         # Content Type by Country (Top 10 countries)
         top_countries_content = filtered_df[filtered_df['first_country'].isin(country_counts.head(10).index)]
         country_type_df = top_countries_content.groupby(['first_country', 'type']).size().reset_index(name='count')
-        
+
         fig_country_type = px.bar(
             country_type_df,
             x='first_country',
@@ -353,7 +420,7 @@ with tab2:
 
 with tab3:
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Content Release Timeline
         yearly_counts = filtered_df.groupby(['release_year', 'type']).size().reset_index(name='count')
@@ -373,14 +440,14 @@ with tab3:
             title_font_size=20
         )
         st.plotly_chart(fig_timeline, use_container_width=True)
-    
+
     with col2:
         # Monthly Release Pattern (if date_added is available)
         if 'date_added' in filtered_df.columns and not filtered_df['date_added'].isna().all():
             filtered_df['date_added'] = pd.to_datetime(filtered_df['date_added'], errors='coerce')
             filtered_df['month_added'] = filtered_df['date_added'].dt.month_name()
             month_counts = filtered_df['month_added'].value_counts()
-            
+
             fig_monthly = px.bar(
                 x=month_counts.index,
                 y=month_counts.values,
@@ -400,7 +467,7 @@ with tab3:
             # Decade distribution as alternative
             filtered_df['decade'] = (filtered_df['release_year'] // 10) * 10
             decade_counts = filtered_df['decade'].value_counts().sort_index()
-            
+
             fig_decade = px.bar(
                 x=decade_counts.index.astype(str) + 's',
                 y=decade_counts.values,
@@ -419,12 +486,12 @@ with tab3:
 
 with tab4:
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # Top Genres
         genres = filtered_df['listed_in'].str.split(', ').explode()
         top_genres = genres.value_counts().head(15)
-        
+
         fig_genres = px.treemap(
             names=top_genres.index,
             values=top_genres.values,
@@ -439,20 +506,20 @@ with tab4:
             title_font_size=20
         )
         st.plotly_chart(fig_genres, use_container_width=True)
-    
+
     with col2:
         # Duration Analysis (if available)
         if 'duration' in filtered_df.columns:
             # Process duration data
             movies_duration = filtered_df[filtered_df['type'] == 'Movie']['duration'].str.extract('(\d+)').astype(float)
             shows_duration = filtered_df[filtered_df['type'] == 'TV Show']['duration'].str.extract('(\d+)').astype(float)
-            
+
             fig_duration = go.Figure()
             if not movies_duration.empty:
                 fig_duration.add_trace(go.Histogram(x=movies_duration[0], name='Movies', opacity=0.7, marker_color='#E50914'))
             if not shows_duration.empty:
                 fig_duration.add_trace(go.Histogram(x=shows_duration[0], name='TV Shows', opacity=0.7, marker_color='#B20710'))
-            
+
             fig_duration.update_layout(
                 title="Duration Distribution",
                 xaxis_title="Duration",
@@ -482,12 +549,61 @@ with tab4:
             )
             st.plotly_chart(fig_scatter, use_container_width=True)
 
+# 🧠 NEW: Title Type Predictor Tab
+with tab5:
+    st.markdown("## 🧠 Netflix Title Type Predictor")
+    st.markdown("Enter a Netflix title and the model will predict whether it's a **Movie** or a **TV Show**.")
+
+    title_input = st.text_input("🎬 Enter Netflix Title")
+
+    if st.button("Predict Type"):
+        if title_input.strip() == "":
+            st.warning("Please enter a title first.")
+        else:
+            try:
+                matched_row = df[df['title'].str.lower() == title_input.lower()]
+                if matched_row.empty:
+                    st.error("❌ Title not found in dataset. Try a known Netflix title.")
+                else:
+                    # Retrieve original values for encoding
+                    original_genre = matched_row.iloc[0]['listed_in']
+                    country = matched_row.iloc[0]['country']
+                    release_year = matched_row.iloc[0]['release_year']
+                    rating = matched_row.iloc[0]['rating']
+
+                    # Ensure the values can be transformed by the encoders
+                    # Handle cases where a value might not have been seen during training
+                    try:
+                        country_encoded = le_country.transform([country])[0]
+                    except ValueError:
+                        country_encoded = -1 # Or handle by predicting a default/most common
+                        st.warning(f"Country '{country}' not seen in training data. Using a default encoding.")
+                    try:
+                        rating_encoded = le_rating.transform([rating])[0]
+                    except ValueError:
+                        rating_encoded = -1
+                        st.warning(f"Rating '{rating}' not seen in training data. Using a default encoding.")
+                    try:
+                        genre_encoded = le_genre.transform([original_genre])[0]
+                    except ValueError:
+                        genre_encoded = -1
+                        st.warning(f"Genre '{original_genre}' not seen in training data. Using a default encoding.")
+
+
+                    input_features = [[country_encoded, release_year, rating_encoded, genre_encoded]]
+                    pred_encoded = model.predict(input_features)[0]
+                    pred_label = le_type.inverse_transform([pred_encoded])[0]
+
+                    st.success(f"🎬 **{title_input}** is predicted to be a **{pred_label}**.")
+            except Exception as e:
+                st.error(f"⚠️ An error occurred during prediction: {str(e)}")
+
 # Data Table Section
 st.markdown("## 📋 Detailed Data")
 with st.expander("View Filtered Dataset", expanded=False):
     # Add search functionality
     search_term = st.text_input("🔍 Search titles:", placeholder="Enter movie or show name...")
-    
+
     if search_term:
         search_df = filtered_df[filtered_df['title'].str.contains(search_term, case=False, na=False)]
         st.write(f"Found {len(search_df)} matches for '{search_term}'")
@@ -543,5 +659,3 @@ st.markdown("""
         <p style="color: #888; margin: 0.5rem 0 0 0;">Powered by Streamlit & Plotly</p>
     </div>
     """, unsafe_allow_html=True)
-
-
