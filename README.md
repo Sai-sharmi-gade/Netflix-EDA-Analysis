@@ -5,6 +5,20 @@ Welcome to my data playground! In this project, I explored the Netflix dataset t
 
 UPDATE: 🎬 Check out the interactive Streamlit dashboard here: [Netflix Analytics Dashboard 🔗](https://netflix-analytics-dashboard.streamlit.app/)
 
+
+
+![image](https://github.com/user-attachments/assets/e48ede7f-afae-4093-9bd4-ac8340a667fe)
+
+
+
+
+
+
+
+![image](https://github.com/user-attachments/assets/36f0222d-dcb5-490a-a1f5-7ed561cca85b)
+
+
+
 ---
 
 ## 🔍 Project Overview
