@@ -1,91 +1,89 @@
 # 🎬 Netflix EDA & Content Type Classifier
 
-Welcome to my data playground! In this project, I explored the Netflix dataset through visual storytelling and built a machine learning model to predict whether a title is a **Movie** or **TV Show** based on its features.
+Welcome to my data playground!  
+This project dives into Netflix’s global catalog with exploratory data analysis (EDA) and a machine learning classifier to predict whether a title is a **Movie** or a **TV Show**.
 
-
-UPDATE: 🎬 Check out the interactive Streamlit dashboard here: [Netflix Analytics Dashboard 🔗](https://netflix-analytics-dashboard.streamlit.app/)
-
-
-
-![image](https://github.com/user-attachments/assets/e48ede7f-afae-4093-9bd4-ac8340a667fe)
-
-
-
-
-
-
-
-![image](https://github.com/user-attachments/assets/36f0222d-dcb5-490a-a1f5-7ed561cca85b)
-
-
+🔗 **Interactive Dashboard:**  
+[Netflix Analytics on Streamlit](https://netflix-analytics-dashboard.streamlit.app/)
 
 ---
 
-## 🔍 Project Overview
+## 📌 Project Highlights
 
-This project is divided into two major parts:
+🔍 **EDA & Visual Storytelling**
+- Cleaned and explored Netflix's real-world dataset
+- Analyzed content types, country-wise trends, ratings, durations, and more
+- Visualized key insights using `Matplotlib` and `Seaborn`
 
-### 1. 🧼 Exploratory Data Analysis (EDA)
-- Cleaned and prepared real-world Netflix data
-- Uncovered insights on content type, release trends, countries, ratings, genres, and durations
-- Created visualizations using `matplotlib` and `seaborn`
-
-### 2. 🤖 Machine Learning Classifier
-- Built a logistic regression model to classify titles as Movies or TV Shows
-- Preprocessed categorical features using `LabelEncoder`
-- Achieved strong performance with evaluation metrics like accuracy and classification report
-- Visualized predictions using a confusion matrix
+🤖 **Machine Learning Classifier**
+- Built a Logistic Regression model to classify content type
+- Encoded categorical variables and scaled features
+- Evaluated model performance using accuracy and confusion matrix
 
 ---
 
-## 📁 Files Included
+## 📁 Project Structure
 
-- `netflix_eda.ipynb` → EDA notebook with graphs and insights
-- `netflix_classifier.ipynb` → Machine learning notebook with model training and evaluation
-- `netflix_titles.csv` → Dataset used (from [Kaggle](https://www.kaggle.com/datasets/shivamb/netflix-shows))
+📦 Netflix-EDA-Classifier
+├── netflix_eda.ipynb # Exploratory data analysis
+├── netflix_classifier.ipynb # Machine learning model training & evaluation
+├── netflix_titles.csv # Original dataset (Kaggle)
+└── README.md
 
----
+yaml
+Copy
+Edit
 
-## 🧠 Key Learnings
-
-- How to clean and preprocess real-world data
-- How to visualize patterns and trends for storytelling
-- How to prepare features for ML models
-- How to evaluate classification results and visualize them
+📥 Dataset Source:  
+[Netflix Shows Dataset on Kaggle](https://www.kaggle.com/datasets/shivamb/netflix-shows)
 
 ---
 
 ## 📊 Sample Visualizations
 
-<img src="https://private-user-images.githubusercontent.com/173789506/446654366-f11ac952-b617-4280-b6b5-18cd443dbb06.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDc5MzAwNTEsIm5iZiI6MTc0NzkyOTc1MSwicGF0aCI6Ii8xNzM3ODk1MDYvNDQ2NjU0MzY2LWYxMWFjOTUyLWI2MTctNDI4MC1iNmI1LTE4Y2Q0NDNkYmIwNi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNTIyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDUyMlQxNjAyMzFaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jMDNkNDQ1MWE1YTQzNWM0M2FlMzg0ZjlhZWUzZmUzOTBmYjEwMDA3NWZkNTZjMDgxYjBjNmI2MTJjMjdmYmNlJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.ZT3wW5Ndka3soxw8pHTTjnSvOIkp4dCKdkG4pXVQkqk" width="400"/>
-
-
-<img src="https://private-user-images.githubusercontent.com/173789506/446655971-5fabde85-0c32-4bb6-b2e3-16fce951e805.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDc5MzAxMTcsIm5iZiI6MTc0NzkyOTgxNywicGF0aCI6Ii8xNzM3ODk1MDYvNDQ2NjU1OTcxLTVmYWJkZTg1LTBjMzItNGJiNi1iMmUzLTE2ZmNlOTUxZTgwNS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNTIyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDUyMlQxNjAzMzdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mNzQ5Yzc0ZGI3ZDY3MGFhNDNkNzBiNGQ2ODZkYTNhZGNjNTdiNjgwMWUzZmUwOGY2YmM3ZmQ3Njc1ZWMxNDA5JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.ZucvBNjUEhnHT0vNTB2jh_Y0SIB_l41oluDWZZjXMdo" width="400"/>
-
-
----
-
-## 🔧 Tech Stack
-
-- `Python`
-- `Pandas`, `NumPy`
-- `Matplotlib`, `Seaborn`
-- `Scikit-learn`
-- `Jupyter Notebook`
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/e48ede7f-afae-4093-9bd4-ac8340a667fe" width="450"/>
+  <img src="https://github.com/user-attachments/assets/36f0222d-dcb5-490a-a1f5-7ed561cca85b" width="450"/>
+</div>
 
 ---
 
-## 🚀 Future Improvements
+## 🧠 What I Learned
 
-- Build an interactive dashboard using **Streamlit**
-- Try other ML models (Decision Tree, Random Forest, SVM)
-- Include NLP-based analysis on title/description fields
+- Cleaning and preprocessing messy real-world data
+- Using visualizations to derive meaningful insights
+- Prepping categorical data for machine learning
+- Evaluating classification models with confidence
 
 ---
 
-## 📬 Connect with Me
+## 🧰 Tech Stack
 
-I’m always down to collaborate or discuss data ideas!
+| Category        | Tools & Libraries                                   |
+|----------------|-----------------------------------------------------|
+| Language        | Python                                              |
+| Data Analysis   | Pandas, NumPy                                       |
+| Visualization   | Matplotlib, Seaborn                                 |
+| Machine Learning| Scikit-learn                                        |
+| IDE/Notebook    | Jupyter Notebook                                    |
 
-- **LinkedIn**: [Sai Sharmi Gade](https://linkedin.com/in/sai-sharmi-gade-55710828b)
-- **GitHub**: [Sai-sharmi-gade](https://github.com/Sai-sharmi-gade)
+---
+
+## 🚀 Future Scope
+
+- Expand ML classifier with Random Forest, SVM, etc.
+- Integrate NLP for deeper analysis of titles and descriptions
+- Enhance the Streamlit dashboard with filter options and more visuals
+
+---
+
+## 💬 Connect with Me
+
+I'm always open to collaborations and data-driven conversations!
+
+- 💼 [LinkedIn](https://linkedin.com/in/sai-sharmi-gade-55710828b)  
+- 💻 [GitHub](https://github.com/Sai-sharmi-gade)
+
+---
+
+> *"Turning raw data into refined stories — one visualization at a time."*
