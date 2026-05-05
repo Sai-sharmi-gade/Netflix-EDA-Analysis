@@ -69,13 +69,6 @@ Edit
 
 ---
 
-## 🚀 Future Scope
-
-- Expand ML classifier with Random Forest, SVM, etc.
-- Integrate NLP for deeper analysis of titles and descriptions
-- Enhance the Streamlit dashboard with filter options and more visuals
-
----
 
 ## 💬 Connect with Me
 
